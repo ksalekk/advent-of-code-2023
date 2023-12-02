@@ -9,38 +9,6 @@ public class Cubes {
     private static final Pattern bluePattern = Pattern.compile("(\\d+) (blue)");
     private static final Pattern greenPattern = Pattern.compile("(\\d+) (green)");
 
-/*    private static boolean extractRed(String line) {
-        Matcher redMatcher = redPattern.matcher(line);
-        while(redMatcher.find()) {
-            int foundNumber = Integer.parseInt(redMatcher.group(1));
-            if(foundNumber > redCubes) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean extractGreen(String line) {
-        Matcher greenMatcher = greenPattern.matcher(line);
-        while(greenMatcher.find()) {
-            int foundNumber = Integer.parseInt(greenMatcher.group(1));
-            if(foundNumber > greenCubes) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean extractBlue(String line) {
-        Matcher blueMatcher = bluePattern.matcher(line);
-        while(blueMatcher.find()) {
-            int foundNumber = Integer.parseInt(blueMatcher.group(1));
-            if(foundNumber > blueCubes) {
-                return false;
-            }
-        }
-        return true;
-    } */
 
     private static boolean isPossiblePart1(String line) {
          return isColorPossible(redPattern.matcher(line), 12)
@@ -57,6 +25,7 @@ public class Cubes {
         }
         return true;
     }
+
 
     private static int getLineSetsPowerPart2(String line) {
         int redMax = getColorMax(redPattern.matcher(line));
