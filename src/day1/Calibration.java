@@ -21,6 +21,14 @@ public class Calibration {
     private static final Pattern findGroupsPattern = Pattern.compile("(?=(one|two|three|four|five|six|seven|eight|nine|\\d))");
     private static final Pattern extractGroupsPattern = Pattern.compile("one|two|three|four|five|six|seven|eight|nine|\\d");
 
+
+    private static int getLineNumberPart1(String line) {
+        String lineDigits = line.replaceAll("\\D", "");
+        String lineNumber = "" + lineDigits.charAt(0) + lineDigits.charAt(lineDigits.length() - 1);
+        return Integer.parseInt(lineNumber);
+    }
+
+
     private static int getLineNumberPart2(String line) {
         StringBuilder digitsBuffer = new StringBuilder();
         String lineNumber;
@@ -45,12 +53,7 @@ public class Calibration {
         return Integer.parseInt(lineNumber);
     }
 
-    private static int getLineNumberPart1(String line) {
-        String lineDigits = line.replaceAll("\\D", "");
-        String lineNumber = "" + lineDigits.charAt(0) + lineDigits.charAt(lineDigits.length() - 1);
-        return Integer.parseInt(lineNumber);
-    }
-
+    
     public static void main(String[] args) {
         System.out.println(System.getProperty("user.dir"));
         File file = new File(System.getProperty("user.dir") + "/src/day1/input.txt");
