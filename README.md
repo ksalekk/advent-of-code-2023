@@ -6,4 +6,4 @@ Advent of Code is an annual coding event where participants tackle a series of p
 ## Languages Used
 I'll be solving challenges using Java language.
 
-Happy coding, and may your code be merry and bright! 🌟🚀
+### Happy coding, and may your code be merry and bright! 🌟🚀
