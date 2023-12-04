@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Calibration {
+public class Trebuchet {
     private static final Map<String, String> replacementWords = Map.of(
             "one", "1",
             "two", "2",
@@ -55,6 +55,8 @@ public class Calibration {
 
     
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+
         System.out.println(System.getProperty("user.dir"));
         File file = new File(System.getProperty("user.dir") + "/src/day1/input.txt");
 
@@ -74,5 +76,8 @@ public class Calibration {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        double time = System.currentTimeMillis()-start;
+        System.out.println("Time: " + time/1000 + "s");
     }
 }
