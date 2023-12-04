@@ -2,7 +2,7 @@ package day3;
 
 import java.io.*;
 
-public class Gear {
+public class GearRatios {
     private static final Line prevLine = new Line();
     private static final Line centerLine = new Line();
     private static Line nextLine = new Line();
@@ -87,11 +87,11 @@ public class Gear {
             System.out.println("Part 1: " + sumPart1);
             System.out.println("Part 2: " + sumPart2);
 
-            double time = System.currentTimeMillis()-start;
-            System.out.println("Time: " + time/1000 + "s");
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        double time = System.currentTimeMillis()-start;
+        System.out.println("Time: " + time/1000 + "s");
     }
 }
