@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Cubes {
+public class CubeConundrum {
     private static final Pattern redPattern = Pattern.compile("(\\d+) (red)");
     private static final Pattern bluePattern = Pattern.compile("(\\d+) (blue)");
     private static final Pattern greenPattern = Pattern.compile("(\\d+) (green)");
@@ -44,7 +44,10 @@ public class Cubes {
         return lastMax;
     }
 
+
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+
         System.out.println(System.getProperty("user.dir"));
         File file = new File(System.getProperty("user.dir") + "/src/day2/input.txt");
 
@@ -62,11 +65,14 @@ public class Cubes {
                 gameId++;
             }
 
-            System.out.println("Part 1 (sum ID): " + idSumPart1);
-            System.out.println("Part 2 (sum of the power of sets): " + powerSumPart2);
+            System.out.println("Part 1: " + idSumPart1);
+            System.out.println("Part 2: " + powerSumPart2);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        double time = System.currentTimeMillis()-start;
+        System.out.println("Time: " + time/1000 + "s");
     }
 }
