@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Seed {
-    private static final int SEEDS_NUMBER = 4;
+    private static final int SEEDS_NUMBER = 20;
     private static final int CATEGORIES_NUMBER = 8;
 
     private static final Pattern numberPattern = Pattern.compile("\\d+");
@@ -94,9 +94,9 @@ public class Seed {
             NumbersRange copy = new NumbersRange(singleRange.get(currentMapPart2).start, singleRange.get(currentMapPart2).stop);
             singleRange.add(copy);
             for(MapRange update : maps.getLast()) {
-                if(singleRange.get(currentMapPart2).start >= update.srcStart && singleRange.get(currentMapPart2).stop < update.srcStop) {
-                    singleRange.get(currentMapPart2 +1).start = singleRange.get(currentMapPart2).start + update.offset;
-                    singleRange.get(currentMapPart2 +1).stop = singleRange.get(currentMapPart2).stop + update.offset;
+                if(singleRange.get(currentMapPart2).start >= update.srcStart && singleRange.get(currentMapPart2).stop <= update.srcStop) {
+                    singleRange.get(currentMapPart2 + 1).start = singleRange.get(currentMapPart2).start + update.offset;
+                    singleRange.get(currentMapPart2 + 1).stop = singleRange.get(currentMapPart2).stop + update.offset;
                     break;
                 }
             }
