@@ -5,13 +5,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Seed {
-    private static final int SEEDS_NUMBER = 20;
+    private static final int SEEDS_NUMBER = 4;
     private static final int CATEGORIES_NUMBER = 8;
 
     private static final Pattern numberPattern = Pattern.compile("\\d+");
@@ -19,8 +17,31 @@ public class Seed {
     private static final Pattern pairPattern = Pattern.compile("(\\d+) (\\d+)");
 
     public static long[][] seeds = new long[SEEDS_NUMBER][CATEGORIES_NUMBER];
-    public static ArrayList<ArrayList<MapUpdate>> maps = new ArrayList<>();
-    public static int currentMap = 0;
+    public static ArrayList<ArrayList<MapRange>> maps = new ArrayList<>();
+    public static int currentMapPart1 = 0;
+    public static int currentMapPart2 = 0;
+
+   public static class MapRange {
+        protected long srcStart;
+        protected long srcStop;
+        protected long offset;
+
+       public MapRange(long[] data) {
+           this.srcStart = data[1];
+           this.srcStop = this.srcStart + data[2];
+           this.offset = data[0] - this.srcStart;
+       }
+   }
+
+    public static class NumbersRange {
+        protected long start;
+        protected long stop;
+
+        public NumbersRange(long start, long stop) {
+            this.start = start;
+            this.stop = stop;
+        }
+    }
 
     public static void loadSeedsPart1(String line) {
         Matcher numberMatcher = numberPattern.matcher(line);
@@ -30,20 +51,6 @@ public class Seed {
         }
     }
 
-   public static class MapUpdate {
-        protected long srcStart;
-        protected long srcStop;
-        protected long destStart;
-        protected long offset;
-
-       public MapUpdate(long[] data) {
-           this.srcStart = data[1];
-           this.srcStop = this.srcStart + data[2];
-           this.destStart = data[0];
-           this.offset = this.destStart - this.srcStart;
-       }
-   }
-
     public static void updateMap(String line) {
         Matcher numberMatcher = numberPattern.matcher(line);
         long[] lineNumbers = new long[3];
@@ -51,74 +58,50 @@ public class Seed {
         while(numberMatcher.find()) {
             lineNumbers[cnt++] = Long.parseLong(numberMatcher.group());
         }
-        maps.getLast().add(new MapUpdate(lineNumbers));
+        maps.getLast().add(new MapRange(lineNumbers));
     }
 
-    public static void updateCategory() {
+    public static void updateCategoryPart1() {
         for(int i = 0; i<seeds.length; i++) {
-            seeds[i][currentMap+1] = seeds[i][currentMap];
-
-            for(MapUpdate update : maps.getLast()) {
-                if(seeds[i][currentMap] >= update.srcStart && seeds[i][currentMap] < update.srcStop) {
-                    seeds[i][currentMap+1] = seeds[i][currentMap] + update.offset;
+            seeds[i][currentMapPart1 +1] = seeds[i][currentMapPart1];
+            for(MapRange update : maps.getLast()) {
+                if(seeds[i][currentMapPart1] >= update.srcStart && seeds[i][currentMapPart1] < update.srcStop) {
+                    seeds[i][currentMapPart1 +1] = seeds[i][currentMapPart1] + update.offset;
                     break;
                 }
             }
         }
-        currentMap++;
-
-
-
-
-        ListIterator<ResultsRange> prevResults = prevResultsRanges.listIterator();
-        while(prevResults.hasNext()) {
-            ResultsRange resultRange = prevResults.next();
-            for(MapUpdate update : maps.getLast()) {
-                long start = Math.max(resultRange.start, update.srcStart);
-                long stop = Math.min(resultRange.stop, update.srcStop);
-                if(start < stop) {
-                    curResultsRanges.add(new ResultsRange(start+update.offset, stop+update.offset));
-                    if(start == resultRange.start && stop == resultRange.stop) {
-                        break;
-                    } else if(start >= resultRange.start && start < resultRange.stop) {
-                        prevResults.add(new ResultsRange(resultRange.start, stop));
-                    } else if(stop >= resultRange.start && stop < resultRange.stop) {
-                        prevResults.add(new ResultsRange(resultRange.start, stop));
-                    } else {
-                        prevResults.add(new ResultsRange(resultRange.start, start));
-                        prevResults.add(new ResultsRange(stop, resultRange.stop));
-                    }
-                }
-            }
-        }
-        ArrayList<ResultsRange> temp = prevResultsRanges;
-        prevResultsRanges = curResultsRanges;
-        curResultsRanges = temp;
-        curResultsRanges.clear();
+        currentMapPart1++;
     }
 
 
-    public static class ResultsRange {
-        protected long start;
-        protected long stop;
 
-        public ResultsRange(long start, long stop) {
-            this.start = start;
-            this.stop = stop;
-        }
-    }
-
-    public static ArrayList<ResultsRange> prevResultsRanges = new ArrayList<>();
-    public static ArrayList<ResultsRange> curResultsRanges = new ArrayList<>();
+    public static ArrayList<ArrayList<NumbersRange>> seedsRanges = new ArrayList<>();
 
     public static void loadSeedsPart2(String line) {
         Matcher pairMatcher = pairPattern.matcher(line);
-
         while(pairMatcher.find()) {
             long start = Long.parseLong(pairMatcher.group(1));
             long range = Long.parseLong(pairMatcher.group(2));
-            prevResultsRanges.add(new ResultsRange(start, start+range));
+            seedsRanges.add(new ArrayList<>());
+            seedsRanges.getLast().add(new NumbersRange(start, start+range));
         }
+    }
+
+    public static void updateCategoryPart2() {
+        for(ArrayList<NumbersRange> singleRange : seedsRanges) {
+            // seedsRanges has size 8 (one for each category)
+            NumbersRange copy = new NumbersRange(singleRange.get(currentMapPart2).start, singleRange.get(currentMapPart2).stop);
+            singleRange.add(copy);
+            for(MapRange update : maps.getLast()) {
+                if(singleRange.get(currentMapPart2).start >= update.srcStart && singleRange.get(currentMapPart2).stop < update.srcStop) {
+                    singleRange.get(currentMapPart2 +1).start = singleRange.get(currentMapPart2).start + update.offset;
+                    singleRange.get(currentMapPart2 +1).stop = singleRange.get(currentMapPart2).stop + update.offset;
+                    break;
+                }
+            }
+        }
+        currentMapPart2++;
     }
 
 
@@ -126,7 +109,7 @@ public class Seed {
         long start = System.currentTimeMillis();
 
         System.out.println(System.getProperty("user.dir"));
-        File file = new File(System.getProperty("user.dir") + "/src/day5/input.txt");
+        File file = new File(System.getProperty("user.dir") + "/src/day5/test.txt");
 
 
         try(BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -152,7 +135,8 @@ public class Seed {
                     headerMatcher = headerPattern.matcher(line);
                     flag = !(headerMatcher.find());
                 }
-                updateCategory();
+                updateCategoryPart1();
+                updateCategoryPart2();
             }
 
             long min = Long.MAX_VALUE;
