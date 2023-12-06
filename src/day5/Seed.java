@@ -91,41 +91,49 @@ public class Seed {
     public static void updateCategoryPart2() {
         for(int i=0; i<seedsRanges.size(); i++) {
             ArrayList<NumbersRange> singleRange = seedsRanges.get(i);
-            // seedsRanges has size 8 (one for each category)
-            NumbersRange copy = new NumbersRange(singleRange.get(currentMapPart2).start, singleRange.get(currentMapPart2).stop);
-            singleRange.add(copy);
+            long inputStart = singleRange.get(currentMapPart2).start;
+            long inputStop = singleRange.get(currentMapPart2).stop;
+
+            // copy
+            singleRange.add(new NumbersRange(inputStart, inputStop));
+
             for(MapRange update : maps.getLast()) {
-                long inputStart = singleRange.get(currentMapPart2).start;
-                long inputStop = singleRange.get(currentMapPart2).stop;
+
                 if(inputStart >= update.srcStart &&  inputStop <= update.srcStop) {
-                    singleRange.get(currentMapPart2 + 1).start = inputStart + update.offset;
-                    singleRange.get(currentMapPart2 + 1).stop = inputStop + update.offset;
+                    translateRanges(singleRange, inputStart, inputStop, update.offset);
                     break;
+
                 } else if(inputStart >= update.srcStart && inputStart < update.srcStop) {
-                    ArrayList<NumbersRange> newBranch = new ArrayList<>();
-                    seedsRanges.add(newBranch);
-                    for(int j=0; j<currentMapPart2; j++) {
-                        newBranch.add(singleRange.get(j));
-                    }
-                    newBranch.add(new NumbersRange(update.srcStop, inputStop));
-                    singleRange.get(currentMapPart2 + 1).start = inputStart + update.offset;
-                    singleRange.get(currentMapPart2 + 1).stop = update.srcStop + update.offset;
+                    createNewBranch(update.srcStop, inputStop, singleRange);
+                    translateRanges(singleRange, inputStart, update.srcStop, update.offset);
                     break;
+
                 } else if(inputStop > update.srcStart && inputStop <= update.srcStop) {
-                    ArrayList<NumbersRange> newBranch = new ArrayList<>();
-                    seedsRanges.add(newBranch);
-                    for(int j=0; j<currentMapPart2; j++) {
-                        newBranch.add(singleRange.get(j));
-                    }
-                    newBranch.add(new NumbersRange(inputStart, update.srcStart));
-                    singleRange.get(currentMapPart2 + 1).start = update.srcStart + update.offset;
-                    singleRange.get(currentMapPart2 + 1).stop = inputStop + update.offset;
+                    createNewBranch(inputStart, update.srcStart, singleRange);
+                    translateRanges(singleRange, update.srcStart, inputStop, update.offset);
                     break;
+
                 }
             }
         }
         currentMapPart2++;
     }
+
+
+    private static void createNewBranch(long rangeStart, long rangeStop, ArrayList<NumbersRange> rootSeedsRange) {
+        ArrayList<NumbersRange> newBranch = new ArrayList<>();
+        seedsRanges.add(newBranch);
+        for(int j=0; j<currentMapPart2; j++) {
+            newBranch.add(rootSeedsRange.get(j));
+        }
+        newBranch.add(new NumbersRange(rangeStart, rangeStop));
+    }
+
+    private static void translateRanges(ArrayList<NumbersRange> seedsRange, long start, long stop, long offset) {
+        seedsRange.get(currentMapPart2 + 1).start = start + offset;
+        seedsRange.get(currentMapPart2 + 1).stop = stop + offset;
+    }
+
 
 
     public static void main(String[] args) {
@@ -162,6 +170,7 @@ public class Seed {
                 updateCategoryPart2();
             }
 
+
             long min = Long.MAX_VALUE;
             for (long[] seed : seeds) {
                 if (seed[7] < min) {
@@ -177,7 +186,6 @@ public class Seed {
                     min2 = seedsRange.getLast().start;
                 }
             }
-
             System.out.println("Part 2: " + min2);
 
         } catch(IOException e) {
