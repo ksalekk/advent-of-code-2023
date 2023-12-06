@@ -89,14 +89,37 @@ public class Seed {
     }
 
     public static void updateCategoryPart2() {
-        for(ArrayList<NumbersRange> singleRange : seedsRanges) {
+        for(int i=0; i<seedsRanges.size(); i++) {
+            ArrayList<NumbersRange> singleRange = seedsRanges.get(i);
             // seedsRanges has size 8 (one for each category)
             NumbersRange copy = new NumbersRange(singleRange.get(currentMapPart2).start, singleRange.get(currentMapPart2).stop);
             singleRange.add(copy);
             for(MapRange update : maps.getLast()) {
-                if(singleRange.get(currentMapPart2).start >= update.srcStart && singleRange.get(currentMapPart2).stop <= update.srcStop) {
-                    singleRange.get(currentMapPart2 + 1).start = singleRange.get(currentMapPart2).start + update.offset;
-                    singleRange.get(currentMapPart2 + 1).stop = singleRange.get(currentMapPart2).stop + update.offset;
+                long inputStart = singleRange.get(currentMapPart2).start;
+                long inputStop = singleRange.get(currentMapPart2).stop;
+                if(inputStart >= update.srcStart &&  inputStop <= update.srcStop) {
+                    singleRange.get(currentMapPart2 + 1).start = inputStart + update.offset;
+                    singleRange.get(currentMapPart2 + 1).stop = inputStop + update.offset;
+                    break;
+                } else if(inputStart >= update.srcStart && inputStart < update.srcStop) {
+                    ArrayList<NumbersRange> newBranch = new ArrayList<>();
+                    seedsRanges.add(newBranch);
+                    for(int j=0; j<currentMapPart2; j++) {
+                        newBranch.add(singleRange.get(j));
+                    }
+                    newBranch.add(new NumbersRange(update.srcStop, inputStop));
+                    singleRange.get(currentMapPart2 + 1).start = inputStart + update.offset;
+                    singleRange.get(currentMapPart2 + 1).stop = update.srcStop + update.offset;
+                    break;
+                } else if(inputStop > update.srcStart && inputStop <= update.srcStop) {
+                    ArrayList<NumbersRange> newBranch = new ArrayList<>();
+                    seedsRanges.add(newBranch);
+                    for(int j=0; j<currentMapPart2; j++) {
+                        newBranch.add(singleRange.get(j));
+                    }
+                    newBranch.add(new NumbersRange(inputStart, update.srcStart));
+                    singleRange.get(currentMapPart2 + 1).start = update.srcStart + update.offset;
+                    singleRange.get(currentMapPart2 + 1).stop = inputStop + update.offset;
                     break;
                 }
             }
@@ -109,7 +132,7 @@ public class Seed {
         long start = System.currentTimeMillis();
 
         System.out.println(System.getProperty("user.dir"));
-        File file = new File(System.getProperty("user.dir") + "/src/day5/test.txt");
+        File file = new File(System.getProperty("user.dir") + "/src/day5/input.txt");
 
 
         try(BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -146,7 +169,16 @@ public class Seed {
                 }
             }
             System.out.println("Part 1: " + min);
-            System.out.println("Part 2: " );
+
+
+            long min2 = Long.MAX_VALUE;
+            for(ArrayList<NumbersRange> seedsRange : seedsRanges) {
+                if(seedsRange.getLast().start < min2) {
+                    min2 = seedsRange.getLast().start;
+                }
+            }
+
+            System.out.println("Part 2: " + min2);
 
         } catch(IOException e) {
             throw new RuntimeException(e);
